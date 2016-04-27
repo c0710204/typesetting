@@ -32,6 +32,7 @@ use Locale::Maketext::Simple (
 
 # Optional parameters {{{
 my $print_author = 0;
+my $git_author   = 0;
 my $commit_count = 1;
 my $width        = 0;
 my $lang         = undef;
@@ -41,6 +42,7 @@ my $man          = 0;
 my ( $git_user, $git_repo, $git_commit_address );
 GetOptions(
     'author'        => \$print_author,
+    'gitauthor=s'   => \$git_author,    
     'startcommit=s' => \$commit_count,
     'width=s'       => \$width,
     'git-c-add=s'   => \$git_commit_address,
@@ -126,14 +128,21 @@ say '\endfoot
 # Get version history from git log {{{
 # git log --pretty=format:'%ai'
 # git log --date=short --pretty=format:'%ad'
+#print "GEN git command...\n";
 my @lines;
-my @git_command = qw(git log --date=short --shortstat);
+my @git_command = qw(git log --date=short --shortstat  );
+if ($git_author)
+{
+#    push( @git_command, qq(--author ) );
+    push( @git_command, qq(--author=$git_author) );
+}
 if ($print_author) {
     push( @git_command, qq(--pretty=format:%H & %an NoTinAuthorFiled& %ad & $git_command_commit_msg) );
 }
 else {
     push( @git_command, qq(--pretty=format:%H %ad & $git_command_commit_msg) );
 }
+#print @git_command;
 @lines = reverse capturex(@git_command);
 # }}}
 
